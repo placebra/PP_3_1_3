@@ -82,10 +82,11 @@ public class AdminController {
                                  @RequestParam(name = "last_name_modal") String lastName,
                                  @RequestParam(name = "age_modal") int age,
                                  @RequestParam(name = "email_modal") String email,
-                                 @RequestParam(name = "roles_modal") String role
+                                 @RequestParam(name = "roles_modal") String role,
+                                 @RequestParam(name = "password_modal", required = false) String password
                                  ) {
 
-        userService.updateUserInfo(id, firstName, lastName, age, email, role);
+        userService.updateUserInfo(id, firstName, lastName, age, email, role, password);
 
         return "redirect:/admin";
     }

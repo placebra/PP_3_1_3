@@ -7,6 +7,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -58,13 +59,18 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role) {
+    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role, String password) {
 
         User user = em.createQuery("select u from User u LEFT JOIN FETCH u.roles where u.id = :id", User.class).setParameter("id", id).getSingleResult();
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setAge(age);
         user.setEmail(email);
+
+        if (password != null) {
+            user.setPassword(password);
+        }
+
 
         List<Role> currentUserRoles = user.getRoles();
         if (role.equals("ADMIN")) {

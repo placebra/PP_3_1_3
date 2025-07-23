@@ -4,6 +4,7 @@ import com.placebra.edu.PP_3_1_2.dao.RoleDao;
 import com.placebra.edu.PP_3_1_2.dao.UserDao;
 import com.placebra.edu.PP_3_1_2.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,13 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private UserDao userDao;
+
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Autowired
     public void setUserDao(UserDao userDao) {
@@ -45,8 +53,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role) {
-        userDao.updateUserInfo(id, firstName, lastName, age, email, role);
+    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role, String password) {
+
+        if (password != null) {
+            password = passwordEncoder.encode(password);
+        }
+
+        userDao.updateUserInfo(id, firstName, lastName, age, email, role, password);
     }
 
 }

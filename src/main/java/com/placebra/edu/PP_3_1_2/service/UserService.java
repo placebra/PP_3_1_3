@@ -9,6 +9,6 @@ public interface UserService {
     public List<User> findAllUsers();
     public void removeUserById(int id);
     public void saveUser(User user);
-    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role);
+    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role, String password);
 
 }

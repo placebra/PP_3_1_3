@@ -16,7 +16,6 @@ public class LoginController {
     @GetMapping("/")
     public String loginPage(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-
         if (userDetails != null) {
             List<String> roles = userDetails.getRoles().stream().map(Role::getName).toList();
             if (roles.contains("ROLE_ADMIN")) {

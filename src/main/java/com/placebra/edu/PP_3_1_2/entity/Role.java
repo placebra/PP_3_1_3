@@ -9,18 +9,18 @@ import java.util.List;
 @Table(name = "roles")
 public class Role {
 
-    public Role() {}
-
-    public Role(String name) {
-        this.name = name;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(name = "name")
     private String name;
+
+    public Role() {}
+
+    public Role(String name) {
+        this.name = name;
+    }
 
 
     public int getId() {
