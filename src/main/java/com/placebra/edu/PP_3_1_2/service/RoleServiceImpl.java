@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class RoleServiceImpl implements RoleService{
 
@@ -28,4 +30,9 @@ public class RoleServiceImpl implements RoleService{
         return roleDao.getAdminRole();
     }
 
+    @Transactional
+    @Override
+    public List<Role> getAllRoles() {
+        return roleDao.getAllRoles();
+    }
 }

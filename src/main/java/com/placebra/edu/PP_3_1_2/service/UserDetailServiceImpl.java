@@ -22,10 +22,10 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     @Transactional
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDao.findUserByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userDao.findUserByEmail(email);
         if (user == null) {
-            throw new UsernameNotFoundException("Not found user: " + username);
+            throw new UsernameNotFoundException("Not found user: " + email);
         }
         return new CustomUserDetails(user);
     }

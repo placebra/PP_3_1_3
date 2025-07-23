@@ -28,4 +28,10 @@ public class RoleDaoImpl implements RoleDao {
         query.setParameter("name", "ROLE_ADMIN");
         return query.getSingleResult();
     }
+
+    @Override
+    public List<Role> getAllRoles() {
+        Query query = em.createQuery("SELECT r FROM Role r", Role.class);
+        return query.getResultList();
+    }
 }

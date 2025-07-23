@@ -9,48 +9,41 @@ import java.util.List;
 @Table(name = "users")
 public class User {
 
-    public User() {}
-
-    public User(String name, String email, String phoneNumber, String username, String password) {
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.username = username;
-        this.password = password;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "age")
+    private int age;
 
     @Column(name = "email")
     private String email;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(name = "username")
-    private String username;
-
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "user_and_role",
-               joinColumns = @JoinColumn(name = "user_id"),
-               inverseJoinColumns = @JoinColumn(name = "roles_id")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "users_and_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private List<Role> roles = new ArrayList<>();
+    private List<Role> roles;
 
-    public void addRole(Role role) {
-        roles.add(role);
-    }
+    public User() {}
 
-    public void removeRole(Role role) {
-        roles.remove(role);
+    public User(String firstname, String lastname, int age, String email, String password) {
+        this.firstName = firstname;
+        this.lastName = lastname;
+        this.age = age;
+        this.email = email;
+        this.password = password;
     }
 
     public void clearRoles() {
@@ -63,29 +56,29 @@ public class User {
     public void setId(int id) {
         this.id = id;
     }
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public int getAge() {
+        return age;
+    }
+    public void setAge(int age) {
+        this.age = age;
     }
     public String getEmail() {
         return email;
     }
     public void setEmail(String email) {
         this.email = email;
-    }
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
     }
     public String getPassword() {
         return password;

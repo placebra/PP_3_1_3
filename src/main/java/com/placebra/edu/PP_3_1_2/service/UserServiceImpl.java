@@ -14,57 +14,39 @@ public class UserServiceImpl implements UserService {
 
     private UserDao userDao;
 
-
     @Autowired
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
 
-    @Transactional
     @Override
-    public User findUserByUsername(String username) {
-        return userDao.findUserByUsername(username);
+    @Transactional //Поиск юзера по email
+    public User findUserByEmail(String email) {
+        return userDao.findUserByEmail(email);
     }
 
-    @Transactional
     @Override
-    public List<User> getAllUsers() {
-        return userDao.getAllUsers();
+    @Transactional
+    public List<User> findAllUsers() {
+        return userDao.findAllUsers();
     }
 
-    @Transactional
     @Override
-    public void saveUser(User user) {
-        userDao.saveUser(user);
-    }
-
     @Transactional
-    @Override
     public void removeUserById(int id) {
         userDao.removeUserById(id);
     }
 
-    @Transactional
     @Override
-    public User getUserById(int id) {
-        return userDao.getUserById(id);
+    @Transactional
+    public void saveUser(User user) {
+        userDao.saveUser(user);
     }
 
-    @Transactional
     @Override
-    public void updateUserName(int id, String name) {
-        userDao.updateUserName(id, name);
+    @Transactional
+    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role) {
+        userDao.updateUserInfo(id, firstName, lastName, age, email, role);
     }
 
-    @Transactional
-    @Override
-    public void updateUserEmail(int id, String email) {
-        userDao.updateUserEmail(id, email);
-    }
-
-    @Transactional
-    @Override
-    public void updateUserPhoneNumber(int id, String phoneNumber) {
-        userDao.updateUserPhoneNumber(id, phoneNumber);
-    }
 }

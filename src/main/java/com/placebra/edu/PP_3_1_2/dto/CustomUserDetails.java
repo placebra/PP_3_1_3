@@ -13,46 +13,66 @@ import java.util.stream.Collectors;
 public class CustomUserDetails implements UserDetails {
 
     private int id;
-    private String name;
+    private String firstName;
+    private String lastName;
+    private int age;
     private String email;
-    private String username;
     private String password;
-    private String phoneNumber;
     private List<Role> roles;
+    private List<String> simpleRoles;
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
-        this.name = user.getName();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.age = user.getAge();
         this.email = user.getEmail();
-        this.username = user.getUsername();
         this.password = user.getPassword();
-        this.phoneNumber = user.getPhoneNumber();
         this.roles = user.getRoles();
+
+        this.simpleRoles = roles.stream()
+                .map(role -> role.getName().replace("ROLE_", "").toLowerCase())
+                .map(e -> e.substring(0, 1).toUpperCase() + e.substring(1))
+                .toList();
     }
 
     public int getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public int getAge() {
+        return age;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
     public List<Role> getRoles() {
         return roles;
     }
 
+    //Роли в формате Admin, User, .....
+    public List<String> getSimpleRoles() {
+        return simpleRoles;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList();
+    }
+
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
@@ -60,10 +80,6 @@ public class CustomUserDetails implements UserDetails {
         return password;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-    }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -84,5 +100,4 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }

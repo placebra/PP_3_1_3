@@ -40,4 +40,18 @@ public class Role {
     public String toString() {
         return name.replaceAll("ROLE_", "");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {return true;}
+        if (o == null || o.getClass() != getClass()) {return false;}
+
+        Role role = (Role) o;
+        return this.name.equals(role.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
 }

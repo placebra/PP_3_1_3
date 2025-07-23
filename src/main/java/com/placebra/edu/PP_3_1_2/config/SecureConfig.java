@@ -25,30 +25,28 @@ public class SecureConfig {
         // ПРАВИЛА РАССМАТРИВАЮТСЯ СВЕРХУ ВНИЗ
         return http
             .formLogin(form -> form  //Включается стандартная форма из коробки
+                    .loginPage("/") //По какому адресу будет Login (ОБЯЗАТЕЛЬНА СВОЯ ФОРМА)
+                    .loginProcessingUrl("/login") //Пост контроллер от спринга
+                    .usernameParameter("email") //name от 1 параметра
+                    .passwordParameter("password") //name от 2 параметра
                     .successHandler(loginSuccessHandler)  // Подключается кастомный SuccessHandler
                     .permitAll())
-            .logout().logoutSuccessUrl("/")
-            .and()
+            .logout(logout -> logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/"))
             .csrf().disable()
 
-
-
                 // возвращает объект HttpSecurity для продолжения настройки
-            .authorizeHttpRequests(auth -> {    // Настройка Http запросов
-            auth
-
+            .authorizeHttpRequests(auth -> { auth   // Настройка Http запросов
+                .requestMatchers("/", "/login").permitAll()
                 .requestMatchers("/admin", "/admin/**") //Если путь содержит /admin?count=50 или /admin/**
                 .hasRole("ADMIN") // То проверь, он авторизован его роль Admin?
                 .requestMatchers("/user", "/user/**") //Если путь содержит /user?id=2 или /user/**
                 .hasAnyRole("USER", "ADMIN")
-                .anyRequest() // На все другие url
-                .permitAll(); // свободный доступ
-
-
+                .anyRequest().permitAll(); // разрешить всё остальное, в том числе несуществующие пути
             })
 
             .userDetailsService(userDetailsService) // Обработчик User-ов
-
 
             .build();     // строит объект SecurityFilterChain на основе настроек // КОНЕЦ
     }

@@ -5,14 +5,10 @@ import java.util.List;
 
 public interface UserService {
 
-    public void saveUser(User user);
-    public User findUserByUsername(String username);
-    public List<User> getAllUsers();
+    public User findUserByEmail(String email);
+    public List<User> findAllUsers();
     public void removeUserById(int id);
-    public User getUserById(int id);
-
-    public void updateUserName(int id, String name);
-    public void updateUserEmail(int id, String email);
-    public void updateUserPhoneNumber(int id, String phoneNumber);
+    public void saveUser(User user);
+    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role);
 
 }

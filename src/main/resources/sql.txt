@@ -1,0 +1,33 @@
+create table users (
+    id int NOT NULL AUTO_INCREMENT,
+    first_name varchar(16),
+    last_name varchar(16),
+    age int,
+    email varchar(64) unique not null,
+    password varchar(64) not null,
+
+    primary key(id)
+);
+
+create table roles (
+    id int not null auto_increment,
+    name varchar(32),
+
+    primary key(id)
+);
+
+create table users_and_roles (
+    user_id int,
+    role_id int,
+
+    primary key(user_id, role_id),
+    foreign key (user_id) references users(id),
+    foreign key (role_id) references roles(id)
+);
+
+insert into users (first_name, last_name, age, email, password) values ('admin', 'admin', 23, 'admin@gmail.com', '$2a$12$6rjveWzdbSHwCXsStI5AjOVNLM3w0G8maPLMWPBSz0nd.iT0vzEpq');
+//pass admin
+insert into users (first_name, last_name, age, email, password) values ('user', 'user', 30, 'user@gmail.com', '$2a$12$48IUaSt2i/oJClvqbP9vmeONQheqOEbUVASdvdi.C9DjSEVobO9GC');
+//pass user
+insert into roles (name) values ('ROLE_ADMIN'), ('ROLE_USER');
+insert into users_and_roles (user_id, role_id) values (1, 1), (1, 2), (2, 2)

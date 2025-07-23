@@ -1,10 +1,12 @@
 package com.placebra.edu.PP_3_1_2.controller;
 
+import com.placebra.edu.PP_3_1_2.dto.CustomUserDetails;
 import com.placebra.edu.PP_3_1_2.entity.Role;
 import com.placebra.edu.PP_3_1_2.entity.User;
 import com.placebra.edu.PP_3_1_2.service.RoleService;
 import com.placebra.edu.PP_3_1_2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +24,7 @@ public class AdminController {
     private RoleService roleService;
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public void setuserService(UserService userService) {
         this.userService = userService;
     }
 
@@ -37,78 +39,53 @@ public class AdminController {
     }
 
     @GetMapping("")
-    public String adminPage(Model model){
-
-        List<User> users = userService.getAllUsers();
-        model.addAttribute("users", users);
-
-        return "main";
-    }
-
-    @GetMapping("/add_user")
-    public String newUser() {
-        return "new_user";
-    }
-
-    @PostMapping("/add_user")
-    public String saveUser(@RequestParam String name,
-                           @RequestParam String email,
-                           @RequestParam(name = "phone_number") String phoneNumber,
-                           @RequestParam String username,
-                           @RequestParam String password,
-                           @RequestParam String role,
-                           Model model) {
-
-        if (userService.findUserByUsername(username) != null) {
-            model.addAttribute("error", "Пользователь с таким Username уже создан");
-            return "new_user";
-        }
-
-        User user = new User(name, email, phoneNumber, username, passwordEncoder.encode(password));
-        List<Role> roles = new ArrayList<>();
-
-        if (role.equals("ROLE_ADMIN")) {
-            roles.add(roleService.getAdminRole());
-            roles.add(roleService.getUserRole());
-        } else if (role.equals("ROLE_USER")) {
-            roles.add(roleService.getUserRole());
-        }
-
-        user.setRoles(roles);
-
-        userService.saveUser(user);
-        return "redirect:/admin";
+    public String adminPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        model.addAttribute("userDetails", userDetails);
+        model.addAttribute("simpleRoles", userDetails.getSimpleRoles());
+        model.addAttribute("activeRole", "admin");
+        model.addAttribute("allUsers", userService.findAllUsers());
+        return "admin_page";
     }
 
     @PostMapping("/remove")
-    public String removeUser(@RequestParam int id) {
-        userService.removeUserById(id);
+    public String removeUser(@RequestParam int user_id_modal) {
+        userService.removeUserById(user_id_modal);
         return "redirect:/admin";
     }
 
-    @GetMapping("/update")
-    public String egitUserPage(@RequestParam int id, Model model) {
+    @PostMapping("/newUser")
+    public String addNewUser(@RequestParam String firstName,
+                             @RequestParam String lastName,
+                             @RequestParam int age,
+                             @RequestParam String email,
+                             @RequestParam String password,
+                             @RequestParam String role) {
 
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
+        if (userService.findUserByEmail(email) != null) {
+            return "redirect:/admin?error#new-user";
+        }
 
-
-        return "update_user";
+        User user = new User(firstName, lastName, age, email, passwordEncoder.encode(password));
+        if (role.equals("Admin")) {
+            List<Role> roles = roleService.getAllRoles();
+            user.setRoles(roles);
+        } else if (role.equals("User")) {
+            user.setRoles(List.of(roleService.getUserRole()));
+        }
+        userService.saveUser(user);
+        return "redirect:/admin?success";
     }
 
-    @PostMapping("/update")
-    public String updateUser(@RequestParam int id,
-                             @RequestParam(required = false) String name,
-                             @RequestParam(required = false) String email,
-                             @RequestParam(required = false, name = "phone_number") String phoneNumber) {
+    @PostMapping("/updateUserInfo")
+    public String updateUserInfo(@RequestParam(name = "user_id_modal") int id,
+                                 @RequestParam(name = "first_name_modal") String firstName,
+                                 @RequestParam(name = "last_name_modal") String lastName,
+                                 @RequestParam(name = "age_modal") int age,
+                                 @RequestParam(name = "email_modal") String email,
+                                 @RequestParam(name = "roles_modal") String role
+                                 ) {
 
-        if (name != null) {
-            userService.updateUserName(id, name);
-        } else if (email != null) {
-            userService.updateUserEmail(id, email);
-        } else if (phoneNumber != null) {
-            userService.updateUserPhoneNumber(id, phoneNumber);
-        }
+        userService.updateUserInfo(id, firstName, lastName, age, email, role);
 
         return "redirect:/admin";
     }

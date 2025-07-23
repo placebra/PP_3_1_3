@@ -1,9 +1,12 @@
 package com.placebra.edu.PP_3_1_2.dao;
 
+import com.placebra.edu.PP_3_1_2.entity.Role;
 import com.placebra.edu.PP_3_1_2.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,22 +17,39 @@ public class UserDaoImpl implements UserDao {
     @PersistenceContext
     private EntityManager em;
 
+    private RoleDao roleDao;
+
+    @Autowired
+    public void setRoleDao(RoleDao roleDao) {
+        this.roleDao = roleDao;
+    }
+
     @Override
-    public User findUserByUsername(String username) {
-        try {
-            return em.createQuery(
-                            "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.username = :username", User.class)
-                    .setParameter("username", username)
-                    .getSingleResult();
-        } catch (NoResultException e) {
+    public User findUserByEmail(String email) {
+        Query query = em.createQuery("select u from User u left join fetch u.roles where u.email = :email");
+        query.setParameter("email", email);
+        List<User> user = query.getResultList();
+
+        if (!user.isEmpty()) {
+            return user.get(0);
+        } else {
             return null;
         }
     }
 
     @Override
-    public List<User> getAllUsers() {
-        List<User> users = em.createQuery("SELECT u FROM User u LEFT JOIN FETCH u.roles", User.class).getResultList();
+    public List<User> findAllUsers() {
+        List<User> users = em.createQuery("select u from User u left join fetch u.roles", User.class).getResultList();
         return users;
+    }
+
+    @Override
+    public void removeUserById(int id) {
+        Query query = em.createQuery("select u from User u left join fetch u.roles where u.id = :id", User.class);
+        query.setParameter("id", id);
+        User user = (User) query.getSingleResult();
+        user.clearRoles();
+        em.remove(user);
     }
 
     @Override
@@ -38,39 +58,25 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void removeUserById(int id) {
-        User user = em.find(User.class, id);
-        user.clearRoles();
-        em.remove(user);
-    }
+    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role) {
 
-    @Override
-    public User getUserById(int id) {
-        try {
-            return em.createQuery(
-                            "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.id = :id", User.class)
-                    .setParameter("id", id)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    @Override
-    public void updateUserName(int id, String name) {
-        User user = em.find(User.class, id);
-        user.setName(name);
-    }
-
-    @Override
-    public void updateUserEmail(int id, String email) {
-        User user = em.find(User.class, id);
+        User user = em.createQuery("select u from User u LEFT JOIN FETCH u.roles where u.id = :id", User.class).setParameter("id", id).getSingleResult();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setAge(age);
         user.setEmail(email);
-    }
 
-    @Override
-    public void updateUserPhoneNumber(int id, String phoneNumber) {
-        User user = em.find(User.class, id);
-        user.setPhoneNumber(phoneNumber);
+        List<Role> currentUserRoles = user.getRoles();
+        if (role.equals("ADMIN")) {
+            if (!currentUserRoles.contains(new Role("ROLE_ADMIN"))) {
+                List<Role> allRoles = List.of(roleDao.getUserRole(), roleDao.getAdminRole());
+                user.setRoles(allRoles);
+            }
+        } else if (role.equals("USER")) {
+            if (currentUserRoles.contains(new Role("ROLE_ADMIN"))) {
+                List<Role> userRoles = List.of(roleDao.getUserRole());
+                user.setRoles(userRoles);
+            }
+        }
     }
 }

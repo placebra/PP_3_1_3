@@ -15,9 +15,10 @@ public class UserController {
 
     @GetMapping("")
     public String userPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-
-        model.addAttribute("user", userDetails);
-
+        model.addAttribute("userDetails", userDetails);
+        model.addAttribute("simpleRoles", userDetails.getSimpleRoles());
+        model.addAttribute("activeRole", "user");
         return "user_page";
     }
+
 }
