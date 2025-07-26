@@ -67,7 +67,7 @@ public class UserDaoImpl implements UserDao {
         user.setAge(age);
         user.setEmail(email);
 
-        if (password != null) {
+        if (!password.isEmpty()) {
             user.setPassword(password);
         }
 

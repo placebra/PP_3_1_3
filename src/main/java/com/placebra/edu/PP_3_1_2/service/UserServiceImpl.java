@@ -2,6 +2,7 @@ package com.placebra.edu.PP_3_1_2.service;
 
 import com.placebra.edu.PP_3_1_2.dao.RoleDao;
 import com.placebra.edu.PP_3_1_2.dao.UserDao;
+import com.placebra.edu.PP_3_1_2.entity.Role;
 import com.placebra.edu.PP_3_1_2.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,8 +14,8 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private RoleDao roleDao;
     private UserDao userDao;
-
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -25,6 +26,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    @Autowired
+    public void setRoleDao(RoleDao roleDao) {
+        this.roleDao = roleDao;
     }
 
     @Override
@@ -47,7 +53,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void saveUser(User user) {
+    public void saveUser(String firstName, String lastName, int age, String email, String password, String role) {
+
+        User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setAge(age);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+
+        if (role.equals("Admin")) {
+            user.setRoles(roleDao.getAllRoles());
+        } else if (role.equals("User")) {
+            user.setRoles(List.of(roleDao.getUserRole()));
+        }
+
         userDao.saveUser(user);
     }
 
@@ -55,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role, String password) {
 
-        if (password != null) {
+        if (!password.isEmpty()) {
             password = passwordEncoder.encode(password);
         }
 

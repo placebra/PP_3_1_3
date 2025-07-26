@@ -23,6 +23,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         List<String> roles = authority.stream().map(GrantedAuthority::getAuthority).toList();
 
+        //Авто редирект после авторизации
         if (roles.contains("ROLE_ADMIN")) {
             response.sendRedirect("/admin");
         } else if (roles.contains("ROLE_USER")) {

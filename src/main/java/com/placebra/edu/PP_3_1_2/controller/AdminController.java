@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private PasswordEncoder passwordEncoder;
     private UserService userService;
     private RoleService roleService;
 
@@ -33,10 +32,7 @@ public class AdminController {
         this.roleService = roleService;
     }
 
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
+
 
     @GetMapping("")
     public String adminPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
@@ -65,14 +61,7 @@ public class AdminController {
             return "redirect:/admin?error#new-user";
         }
 
-        User user = new User(firstName, lastName, age, email, passwordEncoder.encode(password));
-        if (role.equals("Admin")) {
-            List<Role> roles = roleService.getAllRoles();
-            user.setRoles(roles);
-        } else if (role.equals("User")) {
-            user.setRoles(List.of(roleService.getUserRole()));
-        }
-        userService.saveUser(user);
+        userService.saveUser(firstName, lastName, age, email, password, role);
         return "redirect:/admin?success";
     }
 

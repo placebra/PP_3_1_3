@@ -16,6 +16,7 @@ public class LoginController {
     @GetMapping("/")
     public String loginPage(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
+        //если юзер прошел аутентификацию, не пускать на логин форму
         if (userDetails != null) {
             List<String> roles = userDetails.getRoles().stream().map(Role::getName).toList();
             if (roles.contains("ROLE_ADMIN")) {

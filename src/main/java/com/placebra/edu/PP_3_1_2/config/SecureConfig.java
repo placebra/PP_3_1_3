@@ -24,7 +24,7 @@ public class SecureConfig {
 
         // ПРАВИЛА РАССМАТРИВАЮТСЯ СВЕРХУ ВНИЗ
         return http
-            .formLogin(form -> form  //Включается стандартная форма из коробки
+            .formLogin(form -> form
                     .loginPage("/") //По какому адресу будет Login (ОБЯЗАТЕЛЬНА СВОЯ ФОРМА)
                     .loginProcessingUrl("/login") //Пост контроллер от спринга
                     .usernameParameter("email") //name от 1 параметра
@@ -34,11 +34,10 @@ public class SecureConfig {
             .logout(logout -> logout
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/"))
-            .csrf().disable()
+            .csrf().disable() // отключение csrf для post запросов
 
-                // возвращает объект HttpSecurity для продолжения настройки
             .authorizeHttpRequests(auth -> { auth   // Настройка Http запросов
-                .requestMatchers("/", "/login").permitAll()
+                .requestMatchers("/", "/login").permitAll() // в корень и на /login пускать всех
                 .requestMatchers("/admin", "/admin/**") //Если путь содержит /admin?count=50 или /admin/**
                 .hasRole("ADMIN") // То проверь, он авторизован его роль Admin?
                 .requestMatchers("/user", "/user/**") //Если путь содержит /user?id=2 или /user/**
