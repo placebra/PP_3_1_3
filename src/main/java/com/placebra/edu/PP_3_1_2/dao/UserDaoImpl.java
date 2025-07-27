@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -59,7 +60,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role, String password) {
+    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, List <String> roles, String password) {
 
         User user = em.createQuery("select u from User u LEFT JOIN FETCH u.roles where u.id = :id", User.class).setParameter("id", id).getSingleResult();
         user.setFirstName(firstName);
@@ -71,18 +72,19 @@ public class UserDaoImpl implements UserDao {
             user.setPassword(password);
         }
 
+        List<String> currentRoles = user.getRoles().stream().map(Role::getName).sorted().toList();
+        roles = roles.stream().sorted().toList();
 
-        List<Role> currentUserRoles = user.getRoles();
-        if (role.equals("ADMIN")) {
-            if (!currentUserRoles.contains(new Role("ROLE_ADMIN"))) {
-                List<Role> allRoles = List.of(roleDao.getUserRole(), roleDao.getAdminRole());
-                user.setRoles(allRoles);
+        List<Role> newRoles = new ArrayList<Role>();
+        if (!currentRoles.equals(roles)) {
+            if (roles.contains("ROLE_ADMIN") && roles.contains("ROLE_USER")) {
+                newRoles = roleDao.getAllRoles();
+            } else if (roles.contains("ROLE_ADMIN")) {
+                newRoles.add(roleDao.getAdminRole());
+            } else if (roles.contains("ROLE_USER")) {
+                newRoles.add(roleDao.getUserRole());
             }
-        } else if (role.equals("USER")) {
-            if (currentUserRoles.contains(new Role("ROLE_ADMIN"))) {
-                List<Role> userRoles = List.of(roleDao.getUserRole());
-                user.setRoles(userRoles);
-            }
+            user.setRoles(newRoles);
         }
     }
 }

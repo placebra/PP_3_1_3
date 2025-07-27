@@ -50,6 +50,14 @@ public class User {
         roles.clear();
     }
 
+    public List<String> getSimpleRoles() {
+        return roles.stream()
+                .map(role -> role.getName().replace("ROLE_", "").toLowerCase())
+                .map(e -> e.substring(0, 1).toUpperCase() + e.substring(1))
+                .toList();
+    }
+
+
     public int getId() {
         return id;
     }

@@ -38,7 +38,6 @@ public class AdminController {
     public String adminPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
         model.addAttribute("userDetails", userDetails);
         model.addAttribute("simpleRoles", userDetails.getSimpleRoles());
-        model.addAttribute("activeRole", "admin");
         model.addAttribute("allUsers", userService.findAllUsers());
         return "admin_page";
     }
@@ -55,13 +54,13 @@ public class AdminController {
                              @RequestParam int age,
                              @RequestParam String email,
                              @RequestParam String password,
-                             @RequestParam String role) {
+                             @RequestParam List<String> roles) {
 
         if (userService.findUserByEmail(email) != null) {
             return "redirect:/admin?error#new-user";
         }
 
-        userService.saveUser(firstName, lastName, age, email, password, role);
+        userService.saveUser(firstName, lastName, age, email, password, roles);
         return "redirect:/admin?success";
     }
 
@@ -71,11 +70,11 @@ public class AdminController {
                                  @RequestParam(name = "last_name_modal") String lastName,
                                  @RequestParam(name = "age_modal") int age,
                                  @RequestParam(name = "email_modal") String email,
-                                 @RequestParam(name = "roles_modal") String role,
+                                 @RequestParam(name = "roles") List<String> roles,
                                  @RequestParam(name = "password_modal", required = false) String password
                                  ) {
 
-        userService.updateUserInfo(id, firstName, lastName, age, email, role, password);
+        userService.updateUserInfo(id, firstName, lastName, age, email, roles, password);
 
         return "redirect:/admin";
     }

@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void saveUser(String firstName, String lastName, int age, String email, String password, String role) {
+    public void saveUser(String firstName, String lastName, int age, String email, String password, List<String> roles) {
 
         User user = new User();
         user.setFirstName(firstName);
@@ -62,24 +63,30 @@ public class UserServiceImpl implements UserService {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
 
-        if (role.equals("Admin")) {
-            user.setRoles(roleDao.getAllRoles());
-        } else if (role.equals("User")) {
-            user.setRoles(List.of(roleDao.getUserRole()));
+        List<Role> roleList = new ArrayList<>();
+
+        if (roles.contains("Admin") && roles.contains("User")) {
+            roleList = roleDao.getAllRoles();
+        } else if (roles.contains("Admin")) {
+            roleList.add(roleDao.getAdminRole());
+        } else if (roles.contains("User")) {
+            roleList.add(roleDao.getUserRole());
         }
+
+        user.setRoles(roleList);
 
         userDao.saveUser(user);
     }
 
     @Override
     @Transactional
-    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, String role, String password) {
+    public void updateUserInfo(int id, String firstName, String lastName, int age, String email, List<String> roles, String password) {
 
         if (!password.isEmpty()) {
             password = passwordEncoder.encode(password);
         }
 
-        userDao.updateUserInfo(id, firstName, lastName, age, email, role, password);
+        userDao.updateUserInfo(id, firstName, lastName, age, email, roles, password);
     }
 
 }

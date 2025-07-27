@@ -17,7 +17,13 @@ public class UserController {
     public String userPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
         model.addAttribute("userDetails", userDetails);
         model.addAttribute("simpleRoles", userDetails.getSimpleRoles());
-        model.addAttribute("activeRole", "user");
+
+        if (userDetails.getSimpleRoles().contains("Admin")) {
+            model.addAttribute("showAdminPanel", true);
+        } else {
+            model.addAttribute("showAdminPanel", false);
+        }
+
         return "user_page";
     }
 
